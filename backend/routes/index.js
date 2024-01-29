@@ -4,7 +4,7 @@ const userRouter = require("./user")
 const rootRouter = express.Router()
 
 //user request routed to user router
-router.use("/user", userRouter)
+rootRouter.use("/user", userRouter)
 
 module.exports = rootRouter
 
