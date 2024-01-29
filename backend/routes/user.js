@@ -12,6 +12,7 @@ userRouter.get("/hi", (req, res) => {
     })
 })
 
+
 const signupBody = zod.object({
     username: zod.string().email(),
     firstName: zod.string(),
@@ -78,7 +79,6 @@ userRouter.post('/signup', async (req, res) => {
             const error = new Error("Error! Something went wrong.");
             return next(error);
         }
-
     } catch (error) {
         console.log("error occured in user creation in db", error)
         return res.status(411).json({
@@ -87,10 +87,12 @@ userRouter.post('/signup', async (req, res) => {
     }
 })
 
+
 const signinBody = zod.object({
     username: zod.string().email(),
     password: zod.string().min(6)
 })
+
 userRouter.post('/signin', async (req, res) => {
 
     const { username, password } = req.body;
@@ -124,7 +126,8 @@ userRouter.post('/signin', async (req, res) => {
             try {
                 //jwt generation for user credential username, secretkey which will expire in 1 hour
                 token = jwt.sign({ username: username, }, jwtSecret, { expiresIn: "1h" })
-                console.log(token)
+                // console.log(token)
+                console.log("signin successful")
                 res.status(200).json({
                     message: "login successful",
                     token: token
