@@ -96,12 +96,13 @@ userRouter.post('/signup', async (req, res) => {
         //make a new entry in db for user
         const dbUser = await User.create(userData)
         console.log("user created successfully", dbUser)
+        const userId = dbUser._id;
 
         console.log("------creating account")
         //create new bank account and intialize user balance
         try {
             await Account.create({
-                userId: dbUser._id,
+                userId: userId,
                 balance: 1 + Math.random() * 10000 //initialize user balance randomly between 1-10000 on signup
             })
             console.log("account created successfully")
@@ -117,11 +118,12 @@ userRouter.post('/signup', async (req, res) => {
         //generate jwt for user
         let token
         try {
-            //jwt generation for user credential username andsecretkey which will expire in 1 hour
+            //jwt generation for user credential username,userId in db and secretkey which will expire in 1 hour
             //**so during token access, we can only decode username from jwt nothing else will not be decoded from jwt */
             token = jwt.sign(
                 {
                     username: userData.username,
+                    userId: userId
                 },
                 jwtSecret,
                 { expiresIn: "1h" }
@@ -174,7 +176,9 @@ userRouter.post('/signin', async (req, res) => {
     //make db request to check if there is any entry corrospond to given username and password
     try {
         const user = await User.findOne({ username, password })
-        if (!user) {
+        const userId = user._id
+
+        if (!userId) {
             console.log("signin failed as there is no user corrospond to given username and password")
             res.status(411).json({
                 message: "Error while logging in"
@@ -183,8 +187,8 @@ userRouter.post('/signin', async (req, res) => {
         else {
             let token
             try {
-                //jwt generation for user credential username, secretkey which will expire in 1 hour
-                token = jwt.sign({ username: username, }, jwtSecret, { expiresIn: "1h" })
+                //jwt generation for user credential username,userId from db and secret key which will expire in 1 hour
+                token = jwt.sign({ username: username, userId: userId }, jwtSecret, { expiresIn: "1h" })
                 // console.log(token)
                 console.log("signin successful")
                 res.status(200).json({

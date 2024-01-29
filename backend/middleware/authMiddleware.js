@@ -23,6 +23,7 @@ const authMiddleware = async (req, res, next) => {
     try {
         const decoded = jwt.verify(token, jwtSecret)
         req.username = decoded.username
+        req.userId = decoded.userId
         next()
     } catch (error) {
         console.error(error);
