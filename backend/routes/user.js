@@ -4,6 +4,7 @@ const { User } = require("../db")
 const jwtSecret = require("../config")
 const jwt = require("jsonwebtoken")
 const authMiddleware = require("../middleware/authMiddleware")
+const { Account } = require("../db")
 
 const userRouter = express.Router()
 
@@ -95,6 +96,24 @@ userRouter.post('/signup', async (req, res) => {
         //make a new entry in db for user
         const dbUser = await User.create(userData)
         console.log("user created successfully", dbUser)
+
+        console.log("------creating account")
+        //create new bank account and intialize user balance
+        try {
+            await Account.create({
+                userId: dbUser._id,
+                balance: 1 + Math.random() * 10000 //initialize user balance randomly between 1-10000 on signup
+            })
+            console.log("account created successfully")
+        } catch (error) {
+            console.log("account creation failed")
+            console.log(error)
+            return res.status(411).json({
+                msg: "account creation failed",
+                success: false
+            })
+        }
+
         //generate jwt for user
         let token
         try {

@@ -20,10 +20,14 @@ const UserSchema = new mongoose.Schema(
         firstName: {
             type: String,
             required: true,
+            trim: true,
+            maxLength: 50
         },
         lastName: {
             type: String,
             required: true,
+            trim: true,
+            maxLength: 50
         },
         username: {
             type: String,
@@ -53,7 +57,7 @@ const accountSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
-        balancd: {
+        balance: {
             type: Number,
             required: true
         }
@@ -65,6 +69,6 @@ const Account = mongoose.model("Account", accountSchema)
 
 module.exports = {
     User,
-    Bank,
+    Account,
     connectDB
 }
