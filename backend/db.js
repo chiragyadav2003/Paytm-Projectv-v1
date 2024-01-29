@@ -43,10 +43,28 @@ const UserSchema = new mongoose.Schema(
     {
         timestamps: true
     })
-
 const User = mongoose.model("User", UserSchema)
+
+
+const accountSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId, //reference to User model
+            ref: "User",
+            required: true
+        },
+        balancd: {
+            type: Number,
+            required: true
+        }
+    },
+    {
+        timestamps: true
+    })
+const Account = mongoose.model("Account", accountSchema)
 
 module.exports = {
     User,
+    Bank,
     connectDB
 }
