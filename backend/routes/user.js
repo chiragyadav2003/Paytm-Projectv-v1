@@ -3,16 +3,57 @@ const zod = require("zod")
 const { User } = require("../db")
 const jwtSecret = require("../config")
 const jwt = require("jsonwebtoken")
+const authMiddleware = require("../middleware/authMiddleware")
 
 const userRouter = express.Router()
 
-userRouter.get("/hi", (req, res) => {
-    res.json({
-        msg: "hi, hope you are doing well"
-    })
+//**------- PUT request router to update user info in db -------- */
+const updateBody = zod.object({
+    //here we are adding optional as they are not must parameter which will be required in body
+    password: zod.string().min(6).optional(),
+    firstName: zod.string().optional(),
+    lastName: zod.string().optional(),
 })
 
+userRouter.put("/", authMiddleware, async (req, res) => {
+    const { success } = updateBody.safeParse(req.body)
+    if (!success) {
+        console.log("invalid data for updation");
+        return res.status(411).json({
+            success: false,
+            message: "invalid info for user info updation"
+        })
+    }
+    const update = {
+        password: req.body.password,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName
+    }
+    //filter will contain username of user which we get from successfuk authentication
+    const filter = { username: req.username }
+    // console.log("username from authmiddleware", req.username)
 
+    //updation of document
+    try {
+        //this will return old document
+        // const updatedDocument = await User.findOneAndUpdate(filter, update) 
+
+        //this will return updated document
+        const updatedDocument = await User.findOneAndUpdate(filter, update, { new: true })
+        console.log("user info updated successfully", updatedDocument)
+        return res.status(200).json({
+            success: true,
+            updatedInfo: updatedDocument
+        })
+    } catch (error) {
+        return res.status(411).json({
+            success: false,
+            message: "Error while updating information"
+        })
+    }
+})
+
+//** ----------- SIGNUP router ------------------ */
 const signupBody = zod.object({
     username: zod.string().email(),
     firstName: zod.string(),
@@ -35,7 +76,7 @@ userRouter.post('/signup', async (req, res) => {
         })
     }
 
-    console.log("--\nzod validation is true")
+    // console.log("--\nzod validation is true")
 
     //check if any user exist for same email or not
     const userExist = await User.findOne({ username: req.body.username })
@@ -87,7 +128,7 @@ userRouter.post('/signup', async (req, res) => {
     }
 })
 
-
+//** ------------SIGNIN router ---------------- */
 const signinBody = zod.object({
     username: zod.string().email(),
     password: zod.string().min(6)
