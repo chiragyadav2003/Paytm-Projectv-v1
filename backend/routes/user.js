@@ -98,12 +98,11 @@ userRouter.post('/signup', async (req, res) => {
         //generate jwt for user
         let token
         try {
-            //jwt generation for user credential username,firstname,lastnamewith secretkey which will expire in 1 hour
+            //jwt generation for user credential username andsecretkey which will expire in 1 hour
+            //**so during token access, we can only decode username from jwt nothing else will not be decoded from jwt */
             token = jwt.sign(
                 {
                     username: userData.username,
-                    firstName: userData.firstName,
-                    lastName: userData.lastName
                 },
                 jwtSecret,
                 { expiresIn: "1h" }
@@ -188,6 +187,60 @@ userRouter.post('/signin', async (req, res) => {
         })
     }
 
+})
+
+
+//**-----------GET request for finding user on basis of their first or last name which will be passed as query parameter----------- */
+//here validation is not required
+/*
+    const { success } = bulkBody.safeParse(req.body)
+    if (!success) {
+        console.log("invalid data for searching in db");
+        return res.status(411).json({
+            success: false,
+            message: "invalid info for user searching in db"
+        })
+    }
+    const bulkBody = zod.object({
+        firstName: zod.string().optional(),
+        lastName: zod.string().optional(),
+    })
+*/
+userRouter.get("/bulk", authMiddleware, async (req, res) => {
+    /*
+        This line extracts the value of the `filter` query parameter from the request URL. If the `filter` parameter is not provided in the request, it defaults to an empty string
+    */
+    const filter = req.query.filter || "";
+
+    //users obtained will be an array as there can be more than one result fot that query
+    const users = await User.find({
+        $or: [
+            {      //first condition
+                firstName: {
+                    "$regex": filter
+                }
+            },
+            { //second conditiom
+                lastName: {
+                    "$regex": filter
+                }
+            }
+        ]
+    })
+    /*
+        This code queries the database (presumably MongoDB) using the Mongoose ORM. It searches for users whose `firstName` or `lastName` matches the specified regex pattern in the `filter` query parameter.
+        - The `$or` operator performs a logical OR operation, allowing the query to match documents that satisfy at least one of the conditions.
+        - The `"$regex"` operator specifies a regular expression pattern to match against the field values.
+    */
+
+    res.json({
+        user: users.map((user) => ({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            _id: user._id
+        }))
+    })
 })
 
 
