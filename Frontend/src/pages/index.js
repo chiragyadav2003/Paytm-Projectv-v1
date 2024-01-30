@@ -1,6 +1,6 @@
-import Signin from "./Dashboard"
-import Signup from "./Signup"
+import SignIn from "./SignIn"
+import SignUp from "./SignUp"
 import Dashboard from "./Dashboard"
 import SendMoney from "./SendMoney"
 
-export { Signin, Signup, Dashboard, SendMoney }
+export { SignIn, SignUp, Dashboard, SendMoney }

@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { Signin, Signup, Dashboard, SendMoney } from "./pages/index"
+import { SignIn, SignUp, Dashboard, SendMoney } from "./pages/index"
 
 function App() {
 
@@ -7,10 +7,10 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/signin" element={<Signin />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/send" element={<SendMoney />} />
+          <Route path="/sendmoney" element={<SendMoney />} />
         </Routes>
       </BrowserRouter>
     </>
