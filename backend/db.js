@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema(
             trim: true,
             maxLength: 50
         },
-        username: {
+        userName: {
             type: String,
             required: true,
             unique: true,

@@ -30,9 +30,9 @@ userRouter.put("/", authMiddleware, async (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName
     }
-    //filter will contain username of user which we get from successfuk authentication
-    const filter = { username: req.username }
-    // console.log("username from authmiddleware", req.username)
+    //filter will contain userName of user which we get from successfuk authentication
+    const filter = { userName: req.userName }
+    // console.log("userName from authmiddleware", req.userName)
 
     //updation of document
     try {
@@ -41,7 +41,7 @@ userRouter.put("/", authMiddleware, async (req, res) => {
 
         //this will return updated document
         const updatedDocument = await User.findOneAndUpdate(filter, update, { new: true })
-        console.log("user info updated successfully", updatedDocument)
+        // console.log("user info updated successfully", updatedDocument)
         return res.status(200).json({
             success: true,
             updatedInfo: updatedDocument
@@ -56,7 +56,7 @@ userRouter.put("/", authMiddleware, async (req, res) => {
 
 //** ----------- SIGNUP router ------------------ */
 const signupBody = zod.object({
-    username: zod.string().email(),
+    userName: zod.string().email(),
     firstName: zod.string(),
     lastName: zod.string(),
     password: zod.string().min(6)
@@ -77,11 +77,9 @@ userRouter.post('/signup', async (req, res) => {
         })
     }
 
-    // console.log("--\nzod validation is true")
-
     //check if any user exist for same email or not
-    const userExist = await User.findOne({ username: req.body.username })
-    console.log("userexist", userExist)
+    const userExist = await User.findOne({ userName: req.body.userName })
+    // console.log("userexist", userExist)
 
     //if user exist for same email then return status code - 411
     if (userExist) {
@@ -91,11 +89,11 @@ userRouter.post('/signup', async (req, res) => {
         })
     }
 
-    //if user have unique username i.e, email then this code will run
+    //if user have unique userName i.e, email then this code will run
     try {
         //make a new entry in db for user
         const dbUser = await User.create(userData)
-        console.log("user created successfully", dbUser)
+        // console.log("user created successfully", dbUser)
         const userId = dbUser._id;
 
         console.log("------creating account")
@@ -118,11 +116,11 @@ userRouter.post('/signup', async (req, res) => {
         //generate jwt for user
         let token
         try {
-            //jwt generation for user credential username,userId in db and secretkey which will expire in 1 hour
-            //**so during token access, we can only decode username from jwt nothing else will not be decoded from jwt */
+            //jwt generation for user credential userName,userId in db and secretkey which will expire in 1 hour
+            //**so during token access, we can only decode userName from jwt nothing else will not be decoded from jwt */
             token = jwt.sign(
                 {
-                    username: userData.username,
+                    userName: userData.userName,
                     userId: userId
                 },
                 jwtSecret,
@@ -141,7 +139,8 @@ userRouter.post('/signup', async (req, res) => {
             return next(error);
         }
     } catch (error) {
-        console.log("error occured in user creation in db", error)
+        // console.log("error occured in user creation in db", error)
+        console.log("error occured in user creation in db")
         return res.status(411).json({
             msg: "user creation failed"
         })
@@ -150,16 +149,16 @@ userRouter.post('/signup', async (req, res) => {
 
 //** ------------SIGNIN router ---------------- */
 const signinBody = zod.object({
-    username: zod.string().email(),
+    userName: zod.string().email(),
     password: zod.string().min(6)
 })
 
 userRouter.post('/signin', async (req, res) => {
 
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const { userName, password } = req.body;
+    if (!userName || !password) {
         return res.status(411).json({
-            message: "Username or Password not present",
+            message: "userName or Password not present",
         })
     }
 
@@ -167,19 +166,20 @@ userRouter.post('/signin', async (req, res) => {
     const { success } = signinBody.safeParse(req.body)
     //zod validation failed
     if (!success) {
-        console.log("--\nzod validation is false - ", signupZodStatus.error)
+        // console.log("--\nzod validation is false - ", signupZodStatus.error)
+        console.log("--\nzod validation is false - ")
         return res.status(411).json({
             msg: "zod validation failed"
         })
     }
 
-    //make db request to check if there is any entry corrospond to given username and password
+    //make db request to check if there is any entry corrospond to given userName and password
     try {
-        const user = await User.findOne({ username, password })
+        const user = await User.findOne({ userName, password })
         const userId = user._id
 
         if (!userId) {
-            console.log("signin failed as there is no user corrospond to given username and password")
+            console.log("signin failed as there is no user corrospond to given userName and password")
             res.status(411).json({
                 message: "Error while logging in"
             })
@@ -187,8 +187,8 @@ userRouter.post('/signin', async (req, res) => {
         else {
             let token
             try {
-                //jwt generation for user credential username,userId from db and secret key which will expire in 1 hour
-                token = jwt.sign({ username: username, userId: userId }, jwtSecret, { expiresIn: "1h" })
+                //jwt generation for user credential userName,userId from db and secret key which will expire in 1 hour
+                token = jwt.sign({ userName: userName, userId: userId }, jwtSecret, { expiresIn: "1h" })
                 // console.log(token)
                 console.log("signin successful")
                 res.status(200).json({
@@ -258,7 +258,7 @@ userRouter.get("/bulk", authMiddleware, async (req, res) => {
 
     res.json({
         user: users.map((user) => ({
-            username: user.username,
+            userName: user.userName,
             firstName: user.firstName,
             lastName: user.lastName,
             _id: user._id

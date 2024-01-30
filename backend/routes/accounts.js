@@ -8,7 +8,7 @@ const accountRouter = express.Router()
 //**-----GET request for returning user balance------**/
 accountRouter.get("/balance", authmiddleware, async (req, res) => {
     const userId = req.userId;
-    // console.log(userId, req.username)
+    // console.log(userId, req.userName)
     const accountInfo = await Account.findOne({ userId: userId })
     // console.log(accountInfo)
     return res.status(200).json({
@@ -19,10 +19,10 @@ accountRouter.get("/balance", authmiddleware, async (req, res) => {
 
 //****-----POST request - user to transfer money to another account----- **/
 accountRouter.post("/transfer", authmiddleware, async (req, res) => {
-
+    let session;
     try {
         //start session
-        const session = await mongoose.startSession();
+        session = await mongoose.startSession();
 
         //start transaction
         session.startTransaction();
@@ -72,6 +72,10 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
             success: "false",
             message: "internal server error"
         })
+    }
+    finally {
+        //ending session
+        session.endSession();
     }
 
 

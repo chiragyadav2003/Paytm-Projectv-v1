@@ -22,9 +22,9 @@ const authMiddleware = async (req, res, next) => {
     //verification of token
     try {
         const decoded = jwt.verify(token, jwtSecret)
-        req.username = decoded.username
+        req.userName = decoded.userName
         req.userId = decoded.userId
-        // console.log("from middleware", req.userId, req.username)
+        // console.log("from middleware", req.userId, req.userName)
         next()
     } catch (error) {
         console.error(error);
