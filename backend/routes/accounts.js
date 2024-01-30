@@ -30,7 +30,7 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
         const { amount, to } = req.body;
 
         //fetch the account info within the transaction
-        const account = await Account.find({ userId: req.userId }).session(session)
+        const account = await Account.findOne({ userId: req.userId }).session(session)
 
         if (!account || account.balance < amount) {
             await session.abortTransaction();
@@ -42,7 +42,7 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
         }
 
         //find receiver account info from db within transaction
-        const toAccount = await Account.find({ userId: to }).session(session)
+        const toAccount = await Account.findOne({ userId: to }).session(session)
 
         if (!toAccount) {
             await session.abortTransaction();
@@ -54,8 +54,8 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
         }
 
         //perform transaction
-        await Account.updateOne({ userid: req.userid }, { $inc: { balance: -amount } }).session(session)
-        await Account.updateOne({ userid: to }, { $inc: { balance: amount } }).session(session)
+        await Account.updateOne({ userId: req.userId }, { $inc: { balance: -amount } }).session(session)
+        await Account.updateOne({ userId: to }, { $inc: { balance: amount } }).session(session)
 
         //commit the transaction
         await session.commitTransaction()
@@ -68,8 +68,9 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
     }
     catch (error) {
         console.log("transaction error - Error : ", error)
-        res.status(411).json({
-            success: "false"
+        res.status(500).json({
+            success: "false",
+            message: "internal server error"
         })
     }
 
