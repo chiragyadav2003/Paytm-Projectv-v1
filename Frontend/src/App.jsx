@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { SignIn, SignUp, Dashboard, SendMoney, FailedTransaction, SuccessfulTransaction } from "./pages/index"
+import { SignIn, SignUp, Dashboard, SendMoney, FailedTransaction, SuccessfulTransaction, Home } from "./pages/index"
 
 function App() {
 
@@ -8,6 +8,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/send" element={<SendMoney />} />

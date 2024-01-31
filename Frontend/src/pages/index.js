@@ -4,6 +4,7 @@ import Dashboard from "./Dashboard"
 import SendMoney from "./SendMoney"
 import FailedTransaction from "./FailedTransaction"
 import SuccessfulTransaction from "./SuccessfulTransaction"
+import Home from "./Home"
 
 export {
     SignIn,
@@ -11,5 +12,6 @@ export {
     Dashboard,
     SendMoney,
     SuccessfulTransaction,
-    FailedTransaction
+    FailedTransaction,
+    Home
 }
