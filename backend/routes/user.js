@@ -71,9 +71,11 @@ userRouter.post('/signup', async (req, res) => {
 
     //for invalid input return status code - 411
     if (signupZodStatus.success == false) {
-        console.log("--\nzod validation is false - ", signupZodStatus.error)
+        // console.log("--\nzod validation is false - ", signupZodStatus.error)
+        console.log("--\nzod validation failed for given inputs - ")
         return res.status(411).json({
-            msg: "zod validation failed"
+            msg: "zod validation failed for given inpute - invalid input",
+            success: false
         })
     }
 
@@ -85,7 +87,8 @@ userRouter.post('/signup', async (req, res) => {
     if (userExist) {
         console.log("User already exists")
         return res.status(411).json({
-            msg: "signup failed-Email already taken / Incorrect inputs"
+            msg: "signup failed-Email already taken / Incorrect inputs",
+            success: false
         })
     }
 
@@ -128,9 +131,10 @@ userRouter.post('/signup', async (req, res) => {
             )
             // console.log(token)
             return res.status(200).json({
-                msg: "user created successfullyt",
-                user: dbUser,
-                token: token
+                msg: "user created successfully",
+                userName: dbUser.userName,
+                token: token,
+                success: true
             })
         } catch (err) {
             console.log(err);
@@ -142,7 +146,8 @@ userRouter.post('/signup', async (req, res) => {
         // console.log("error occured in user creation in db", error)
         console.log("error occured in user creation in db")
         return res.status(411).json({
-            msg: "user creation failed"
+            msg: "user creation failed",
+            success: false
         })
     }
 })
@@ -159,6 +164,7 @@ userRouter.post('/signin', async (req, res) => {
     if (!userName || !password) {
         return res.status(411).json({
             message: "userName or Password not present",
+            success: false
         })
     }
 
@@ -169,7 +175,8 @@ userRouter.post('/signin', async (req, res) => {
         // console.log("--\nzod validation is false - ", signupZodStatus.error)
         console.log("--\nzod validation is false - ")
         return res.status(411).json({
-            msg: "zod validation failed"
+            msg: "zod validation failed",
+            success: false
         })
     }
 
@@ -181,7 +188,8 @@ userRouter.post('/signin', async (req, res) => {
         if (!userId) {
             console.log("signin failed as there is no user corrospond to given userName and password")
             res.status(411).json({
-                message: "Error while logging in"
+                message: "no user registeres dor given credentials",
+                success: false
             })
         }
         else {
@@ -193,7 +201,8 @@ userRouter.post('/signin', async (req, res) => {
                 console.log("signin successful")
                 res.status(200).json({
                     message: "login successful",
-                    token: token
+                    token: token,
+                    success: true
                 })
             } catch (err) {
                 console.log(err);
@@ -207,6 +216,7 @@ userRouter.post('/signin', async (req, res) => {
         res.status(411).json({
             msg: "request to db for authentication failed-error encountered",
             error: error.message,
+            success: false
         })
     }
 
@@ -255,14 +265,15 @@ userRouter.get("/bulk", authMiddleware, async (req, res) => {
         - The `$or` operator performs a logical OR operation, allowing the query to match documents that satisfy at least one of the conditions.
         - The `"$regex"` operator specifies a regular expression pattern to match against the field values.
     */
-
+    // TODO:return all user except user
     res.json({
         user: users.map((user) => ({
             userName: user.userName,
             firstName: user.firstName,
             lastName: user.lastName,
             _id: user._id
-        }))
+        })),
+        success: true
     })
 })
 

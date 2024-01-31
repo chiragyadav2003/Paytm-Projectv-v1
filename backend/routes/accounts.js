@@ -12,7 +12,8 @@ accountRouter.get("/balance", authmiddleware, async (req, res) => {
     const accountInfo = await Account.findOne({ userId: userId })
     // console.log(accountInfo)
     return res.status(200).json({
-        balance: accountInfo.balance
+        balance: accountInfo.balance,
+        success: false
     })
 })
 
@@ -47,7 +48,7 @@ accountRouter.post("/transfer", authmiddleware, async (req, res) => {
         if (!toAccount) {
             await session.abortTransaction();
             console.log("invaid account number")
-            return res.status(400).json({
+            return res.status(411).json({
                 message: "invalid account",
                 success: false
             });
