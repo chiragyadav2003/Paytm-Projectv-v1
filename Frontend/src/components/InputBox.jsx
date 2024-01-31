@@ -1,5 +1,5 @@
 
-function InputBox({ label, placeholder }) {
+function InputBox({ label, placeholder, onChange }) {
     return (
         <div>
             <div className="text-sm font-medium text-left py-2">
@@ -8,7 +8,7 @@ function InputBox({ label, placeholder }) {
                 </label>
 
             </div>
-            <input className="w-full px-2 py-1 border rounded border-slate-200" id={label} placeholder={placeholder} />
+            <input className="w-full px-2 py-1 border rounded border-slate-200" id={label} placeholder={placeholder} onChange={onChange} />
         </div>
     )
 }
